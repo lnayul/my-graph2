@@ -530,3 +530,70 @@ st.info(
     "제작 국가별로 어떤 장르의 영화가 많이 포함되어 있는지와 "
     "각 국가와 장르가 전체 영화에서 차지하는 규모를 한눈에 비교할 수 있습니다."
 )
+# ==================================================
+# ⑧ 10위권 체류 기간과 총 관객의 관계
+# ==================================================
+st.header("⑧ 10위권에 오래 머문 영화는 총 관객도 많은가")
+
+st.markdown(
+    "영화가 **10위권에 머문 날수**와 **총 관객 수**의 관계를 "
+    "산점도로 확인합니다."
+)
+
+# 분석에 필요한 값이 있는 데이터만 사용
+top10_df = df[
+    (df["days_in_top10"] > 0) &
+    (df["total_audi"] > 0)
+].copy()
+
+fig_top10 = px.scatter(
+    top10_df,
+    x="days_in_top10",
+    y="total_audi",
+    hover_name="movieNm",
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    labels={
+        "days_in_top10": "10위권에 머문 날수",
+        "total_audi": "총 관객 수"
+    }
+)
+
+fig_top10.update_traces(
+    marker=dict(
+        size=10,
+        opacity=0.75
+    ),
+    hovertemplate=(
+        "<b>%{hovertext}</b><br>"
+        "10위권에 머문 날수: %{x:,.0f}일<br>"
+        "총 관객: %{y:,.0f}명"
+        "<extra></extra>"
+    )
+)
+
+fig_top10.update_layout(
+    height=650,
+    xaxis_title="10위권에 머문 날수",
+    yaxis_title="총 관객 수",
+    margin=dict(t=70, b=50, l=20, r=20)
+)
+
+st.plotly_chart(
+    fig_top10,
+    use_container_width=True
+)
+
+# 상관계수 계산
+corr_top10 = top10_df["days_in_top10"].corr(
+    top10_df["total_audi"]
+)
+
+st.markdown("---")
+st.subheader("💡 이 그래프로 알 수 있는 것")
+
+st.info(
+    f"10위권에 머문 날수와 총 관객 수의 피어슨 상관계수는 "
+    f"**{corr_top10:.2f}**입니다. "
+    "산점도의 점들이 어떤 방향으로 분포하는지 살펴보면서 "
+    "두 변수 사이의 관계를 확인할 수 있습니다."
+)
