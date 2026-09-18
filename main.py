@@ -531,69 +531,71 @@ st.info(
     "각 국가와 장르가 전체 영화에서 차지하는 규모를 한눈에 비교할 수 있습니다."
 )
 # ==================================================
-# ⑧ 10위권 체류 기간과 총 관객의 관계
+# ⑧ 나만의 질문
 # ==================================================
-st.header("⑧ 10위권에 오래 머문 영화는 총 관객도 많은가")
+st.header("⑧ 개봉일에 상영 횟수가 많은 영화는 첫 주에도 많은 관객을 모으는가?")
 
 st.markdown(
-    "영화가 **10위권에 머문 날수**와 **총 관객 수**의 관계를 "
+    "개봉일 상영 횟수와 개봉 첫 주 관객 수 사이의 관계를 "
     "산점도로 확인합니다."
 )
 
 # 분석에 필요한 값이 있는 데이터만 사용
-top10_df = df[
-    (df["days_in_top10"] > 0) &
-    (df["total_audi"] > 0)
+my_question_df = df[
+    (df["first_show"] > 0) &
+    (df["first_week_audi"] > 0)
 ].copy()
 
-fig_top10 = px.scatter(
-    top10_df,
-    x="days_in_top10",
-    y="total_audi",
+fig_my_question = px.scatter(
+    my_question_df,
+    x="first_show",
+    y="first_week_audi",
     hover_name="movieNm",
-    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    title="개봉일에 상영 횟수가 많은 영화는 첫 주에도 많은 관객을 모으는가?",
     labels={
-        "days_in_top10": "10위권에 머문 날수",
-        "total_audi": "총 관객 수"
+        "first_show": "개봉일 상영 횟수",
+        "first_week_audi": "개봉 첫 주 관객 수"
     }
 )
 
-fig_top10.update_traces(
+# 마우스를 올렸을 때 영화명과 수치 표시
+fig_my_question.update_traces(
     marker=dict(
         size=10,
         opacity=0.75
     ),
     hovertemplate=(
         "<b>%{hovertext}</b><br>"
-        "10위권에 머문 날수: %{x:,.0f}일<br>"
-        "총 관객: %{y:,.0f}명"
+        "개봉일 상영 횟수: %{x:,.0f}회<br>"
+        "개봉 첫 주 관객: %{y:,.0f}명"
         "<extra></extra>"
     )
 )
 
-fig_top10.update_layout(
+fig_my_question.update_layout(
     height=650,
-    xaxis_title="10위권에 머문 날수",
-    yaxis_title="총 관객 수",
-    margin=dict(t=70, b=50, l=20, r=20)
+    xaxis_title="개봉일 상영 횟수",
+    yaxis_title="개봉 첫 주 관객 수",
+    margin=dict(t=80, b=50, l=20, r=20)
 )
 
 st.plotly_chart(
-    fig_top10,
+    fig_my_question,
     use_container_width=True
 )
 
+
 # 상관계수 계산
-corr_top10 = top10_df["days_in_top10"].corr(
-    top10_df["total_audi"]
+corr_my_question = my_question_df["first_show"].corr(
+    my_question_df["first_week_audi"]
 )
 
 st.markdown("---")
 st.subheader("💡 이 그래프로 알 수 있는 것")
 
 st.info(
-    f"10위권에 머문 날수와 총 관객 수의 피어슨 상관계수는 "
-    f"**{corr_top10:.2f}**입니다. "
-    "산점도의 점들이 어떤 방향으로 분포하는지 살펴보면서 "
+    f"개봉일 상영 횟수와 개봉 첫 주 관객 수의 "
+    f"피어슨 상관계수는 **{corr_my_question:.2f}**입니다. "
+    "산점도에서 점들이 어떤 방향으로 분포하는지 살펴보면서 "
     "두 변수 사이의 관계를 확인할 수 있습니다."
 )
